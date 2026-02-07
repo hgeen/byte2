@@ -15,6 +15,12 @@ typedef struct {
     TokenEnum type;
 } Keyword;
 
+typedef struct {
+        const char *src;
+        size_t pos;
+        unsigned int line;
+} Lexer;
+
 static const Keyword keywords[] = {
     {"if", TOKEN_KEYWORD},
     {"else", TOKEN_KEYWORD},
@@ -35,7 +41,7 @@ static const Keyword keywords[] = {
     {"unsigned", TOKEN_TYPESPECIFIER},
 };
 
-static TokenEnum punct_table[256] = {
+static TokenEnum punct_table[128] = {
     ['('] = TOKEN_LEFTPAREN,
     [')'] = TOKEN_RIGHTPAREN,
     ['{'] = TOKEN_LEFTBRACE,
@@ -161,6 +167,26 @@ char is_letter(const char character) {
         return 1;
 }
 
+static inline char advance(Lexer *l) {
+        return l->src[l->pos++];
+}
+
+static inline char peek_next(Lexer *l) {
+        return l->src[l->pos + 1];
+}
+
+static inline char peek(Lexer *l) {
+        return l->src[l->pos];
+}
+
+static inline char match(Lexer *l, char expected) {
+
+}
+
+Token *next_token() {
+        
+}
+
 TokenEnum get_token_type(const char *lexeme) {
         for (int i = 0; i < sizeof(keywords)/sizeof(keywords[0]); i++) {
                 if (strcmp(lexeme, keywords[i].lexeme) == 0) return keywords[i].type;
@@ -186,55 +212,6 @@ Token *new_token(TokenEnum type, char *lexeme) {
         return t;
 }
 
-// converts == to ==, creates >= and <= operators
-void adjust_tokens(Token *tokens) {
-
-}
-
 Token *get_tokens(FILE *file) {
-        Token *tokens = NULL;
-        Token *tail = NULL;
-        char *lexeme = malloc(sizeof(char) * 64);
-        int i = 0;
-        int line = 1;
-        char eof = 0;
-
-        while((current = fgetc(file))) {
-                if (current == '\n') line++;
-
-                if (current == ' ' || !is_letter(current) || current == EOF) {
-                        if (i == 0) continue;
-
-                        lexeme[i] = '\0';
-                        i = 0;
-
-                        TokenEnum type = get_token_type(lexeme);
-                        Token *new_tok = NULL;
-
-                        new_tok = new_token(type, lexeme);
-
-                        if (tokens == NULL) {
-                                tokens = new_tok;
-                                tail = new_tok;
-                        } else {
-                                tail->next = new_tok;
-                                tail = new_tok;
-                        }
-
-                        if (is_punct(current)) {
-                                TokenEnum t2 = get_token_type(&current);
-                                Token *punct_token = new_token(t2, &current);
-                                tail->next = punct_token;
-                                tail = punct_token;
-                        }
-
-                        if (current == EOF) break;
-                } else {
-                        lexeme[i++] = current;
-                }
-        }
-
-        adjust_tokens(tokens);
-
-        return tokens;
+        Lexer l = {.src = NULL, .pos = 0};
 }

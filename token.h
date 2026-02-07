@@ -23,6 +23,7 @@ typedef enum {
         TOKEN_KEYWORD,
         TOKEN_COMMA,
         TOKEN_EQUALTO,
+        TOKEN_NOTEQUAL,
         TOKEN_GREATERTHAN,
         TOKEN_GTE,
         TOKEN_LESSTHAN,
@@ -30,7 +31,17 @@ typedef enum {
         TOKEN_POSTINCREMENT,
         TOKEN_PREINCREMENT,
         TOKEN_POSTDECREMENT,
-        TOKEN_PREDECREMENT
+        TOKEN_PREDECREMENT,
+        TOKEN_DEREFERENCE,
+        TOKEN_ADDRESSOF,
+        TOKEN_OR,
+        TOKEN_AND,
+        TOKEN_XOR,
+        TOKEN_BAND,
+        TOKEN_BOR,
+        TOKEN_BXOR,
+        TOKEN_LEFTSHIFT,
+        TOKEN_RIGHTSHIFT,
 } TokenEnum;
 
 typedef struct Token {
@@ -39,12 +50,6 @@ typedef struct Token {
         const char *lexeme;
         int line;
 } Token;
-
-typedef struct {
-        const char *src;
-        char current;
-        char *lexeme;
-} Lexer;
 
 Token *get_tokens(FILE* file);
 

@@ -4,6 +4,15 @@
 #include "asm.h"
 #include "vm.h"
 
+// TODO:
+// add way to change the default stack size
+// how?
+// byte main.byte -stksz=[SIZE IN BYTES]
+
+// add input flags for detecting dynamic libraries to link against
+// how?
+// byte main.byte -l somelibrary.dll
+
 int main(int argc, char **argv) {
         if (argc == 0)
                 return -1;
