@@ -3,6 +3,13 @@
 #include "ast.h"
 #include "types.h"
 
+// TODO: (maybe)
+// add a way to do inline 'asm' (not actually asm, just manual bytecodes really)
+
+// TODO: 
+// byte2 libraries are added at the top of the assembly (or just somewhere else as a pointer)
+// library function names are mangled in this file
+
 typedef struct {
         int size;
         int capacity;

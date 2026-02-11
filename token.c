@@ -131,7 +131,7 @@ static EXIT_CODE text_to_float(const char *text, float *buffer) {
         return SUCCESS;
 }
 
-char is_punct(const char character) {
+char is_punct(char character) {
         switch (character) {
                 case '(':
                 case ')':
@@ -162,17 +162,23 @@ char is_reserved(const char *lexeme) {
         return 0;
 }
 
-char is_letter(const char character) {
-        if (character < 'A' || character > 'Z' || character < 'a' || character > 'z' || character < '0' || character > '9') return 0;
-        return 1;
+static inline char is_letter(char character) {
+        //if (character < 'A' || character > 'Z' || character < 'a' || character > 'z' || character < '0' || character > '9') return 0;
+        return (character < 'A' || character > 'Z' || character < 'a' || character > 'z' || character < '0' || character > '9') ? 0 : 1;
+}
+
+static inline char is_alpha(char character) {
+        return (character == ' ' || character == '\t' || character == '\n') ? 1 : 0;
+}
+
+static inline char is_alnum(char character) {
+        return ((character >= '0' && character <= '9') ||
+                (character >= 'Z' && character <= 'Z') ||
+                (character >= 'a' && character <= 'z')) ? 1 : 0;
 }
 
 static inline char advance(Lexer *l) {
         return l->src[l->pos++];
-}
-
-static inline char peek_next(Lexer *l) {
-        return l->src[l->pos + 1];
 }
 
 static inline char peek(Lexer *l) {
@@ -180,11 +186,18 @@ static inline char peek(Lexer *l) {
 }
 
 static inline char match(Lexer *l, char expected) {
-
+        if (expected != peek(l)) return 0;
+        l->pos++;
+        return 1;
 }
 
-Token *next_token() {
-        
+Token *new_token(TokenEnum type, char *lexeme) {
+        Token *t = malloc(sizeof(Token));
+        t->token = type;
+        t->lexeme = lexeme;
+        t->next = NULL;
+        t->prev = NULL;
+        return t;
 }
 
 TokenEnum get_token_type(const char *lexeme) {
@@ -205,13 +218,80 @@ TokenEnum get_token_type(const char *lexeme) {
         return TOKEN_IDENTIFIER;
 }
 
-Token *new_token(TokenEnum type, char *lexeme) {
-        Token *t = malloc(sizeof(Token));
-        t->token = type;
-        t->lexeme = lexeme;
-        return t;
+// TODO:
+// complete rewrite of this, this is terrible
+Token *next_token(Lexer *l) {
+        while (is_alpha(peek(l))) {
+                if (peek(l) == '\n') l->line++;
+
+                advance(l);
+        }
+
+        if (peek(l) == EOF) return new_token(TOKEN_EOF, NULL);
+        
+        // identifiers & keywords
+        else if (is_letter(peek(l)) || peek(l) == '_') {
+                Token *t = malloc(sizeof(Token));
+                char c = 0;
+                int i = 0;
+                int size = 64;
+                char *lexeme = malloc(sizeof(char));
+
+                while ((!is_alpha(c = advance(l)) || c != EOF) && (is_alnum(c) || c == '_')) {
+                        if (c == '\n') {
+                                l->line++;
+                                continue;
+                        }
+
+                }
+        }
+
+        char c = advance(l);
+
+        switch (c) {
+                case '!':
+                        if (match(l, '='))
+                case '=':
+                case '>':
+                case '<':
+                case '*':
+                case '&':
+                case '|':
+                case '+':
+                case '-':
+                case '/':
+                case '~':
+                case '(':
+                case ')':
+                case '{':
+        }
 }
 
 Token *get_tokens(FILE *file) {
         Lexer l = {.src = NULL, .pos = 0};
+        Token *head = malloc(sizeof(Token));
+        Token *current = head;
+        Token *prev = NULL;
+
+        if (peek(&l) != EOF) {
+                head = next_token(&l);
+        }
+
+        while (1) {
+                Token *t = next_token(&l);
+                current->next = t;
+
+                if (current == head) {
+                        current->prev = NULL;
+                } else {
+                        current->prev = prev;
+                }
+
+                if (t->token == TOKEN_EOF) 
+
+                prev = current;
+                current = t;
+        }
+
+        return head;
 }

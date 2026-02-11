@@ -42,12 +42,16 @@ typedef enum {
         TOKEN_BXOR,
         TOKEN_LEFTSHIFT,
         TOKEN_RIGHTSHIFT,
+        TOKEN_EOF,
+        TOKEN_BNOT,
+        TOKEN_NOT,
 } TokenEnum;
 
 typedef struct Token {
         struct Token *next;
-        TokenEnum token;
+        struct Token *prev;
         const char *lexeme;
+        TokenEnum token;
         int line;
 } Token;
 

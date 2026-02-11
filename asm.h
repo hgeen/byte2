@@ -32,7 +32,8 @@ typedef enum {
         OP_STACKARRAY,
         OP_END,
         OP_LABEL,
-} OPCode;
+        OP_GCALL,
+} OpCode;
 
 typedef struct {
         const char *name;

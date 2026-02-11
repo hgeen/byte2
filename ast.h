@@ -1,6 +1,8 @@
 #ifndef AST_H
 #define AST_H
 
+#include "token.h"
+
 typedef enum {
         AST_STATEMENTBLOCK, //array/heap-allocated array of tokens for statements
         AST_FUNCTIONDEFINITION,
@@ -15,7 +17,10 @@ typedef enum {
 typedef struct ListNode {
         struct ListNode *next;
         struct ListNode *children;
-        int numChildren;
+        ASTIdentifier type;
+        Token *tokens;
+        int num_tokens;
+        int num_children;
 } ListNode;
 
 #endif
