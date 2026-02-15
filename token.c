@@ -164,7 +164,9 @@ char is_reserved(const char *lexeme) {
 
 static inline char is_letter(char character) {
         //if (character < 'A' || character > 'Z' || character < 'a' || character > 'z' || character < '0' || character > '9') return 0;
-        return (character < 'A' || character > 'Z' || character < 'a' || character > 'z' || character < '0' || character > '9') ? 0 : 1;
+        return ((character < 'A' || character > 'Z') || 
+                (character < 'a' || character > 'z') ||
+                (character == '_')) ? 1 : 0;
 }
 
 static inline char is_alpha(char character) {
@@ -183,6 +185,14 @@ static inline char advance(Lexer *l) {
 
 static inline char peek(Lexer *l) {
         return l->src[l->pos];
+}
+
+static inline char peek_behind(Lexer *l) {
+        return l->src[l->pos - 1];
+}
+
+static inline char peek_next(Lexer *l) {
+        return l->src[l->pos + 1];
 }
 
 static inline char match(Lexer *l, char expected) {
@@ -250,20 +260,141 @@ Token *next_token(Lexer *l) {
 
         switch (c) {
                 case '!':
-                        if (match(l, '='))
+                        if (match(l, '=')) {
+                                return new_token(TOKEN_NOTEQUAL, NULL);
+                        }
+                        else {
+                                return new_token(TOKEN_NOT, NULL);
+                        }
                 case '=':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_EQUALTO, NULL);
+                        } else {
+                                return new_token(TOKEN_EQUAL, NULL);
+                        }
                 case '>':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_GTE, NULL);
+                        } else if (match(l, '>')) {
+                                advance(l);
+                                return new_token(TOKEN_RIGHTSHIFT, NULL);
+                        } else {
+                                return new_token(TOKEN_GREATERTHAN, NULL);
+                        }
                 case '<':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_LTE, NULL);
+                        } else if (match(l, '>')) {
+                                advance(l);
+                                return new_token(TOKEN_LEFTSHIFT, NULL);
+                        } else {
+                                return new_token(TOKEN_LESSTHAN, NULL);
+                        }
                 case '*':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_MULTEQUAL, NULL);
+                        } else {
+                                return new_token(TOKEN_DEREFORMULT, NULL);
+                        }
                 case '&':
+                        if (match(l, '&')) {
+                                advance(l);
+                                return new_token(TOKEN_AND, NULL);
+                        } else if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_BANDEQ, NULL);
+                        } else {
+                                return new_token(TOKEN_BAND, NULL);
+                        }
+                case '^':
+                        if (match(l, '^')) {
+                                advance(l);
+                                return new_token(TOKEN_XOR, NULL);
+                        } else if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_XOREQ, NULL);
+                        } else {
+                                return new_token(TOKEN_BXOR, NULL);
+                        }
                 case '|':
+                        if (match(l, '|')) {
+                                advance(l);
+                                return new_token(TOKEN_OR, NULL);
+                        } else if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_BOREQ, NULL);
+                        } else {
+                                return new_token(TOKEN_BOR, NULL);
+                        }
                 case '+':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_ADDEQUAL, NULL);
+                        } else if (match(l, '+') && is_letter(peek_next(l))) {
+                                advance(l);
+                                return new_token(TOKEN_PREINCREMENT, NULL);
+                        } else if (match(l, '+') && !is_alpha(peek_behind(l))) {
+                                return new_token(TOKEN_POSTINCREMENT, NULL);
+                        } else {
+                                return new_token(TOKEN_ADD, NULL);
+                        }
                 case '-':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_SUBEQUAL, NULL);
+                        } else if (match(l, '-') && is_letter(peek_next(l))) {
+                                advance(l);
+                                return new_token(TOKEN_PREDECREMENT, NULL);
+                        } else if (match(l, '-') && !is_alpha(peek_behind(l))) {
+                                advance(l);
+                                return new_token(TOKEN_POSTDECREMENT, NULL);
+                        } else if (match(l, '>')) {
+                                advance(l);
+                                return new_token(TOKEN_ARROWDEREF, NULL);
+                        } else {
+                                return new_token(TOKEN_SUB, NULL);
+                        }
                 case '/':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_DIVEQUAL, NULL);
+                        } else {
+                                return new_token(TOKEN_DIV, NULL);
+                        }
                 case '~':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_BNOTEQ, NULL);
+                        } else {
+                                return new_token(TOKEN_BNOT, NULL);
+                        }
+                case '%':
+                        if (match(l, '=')) {
+                                advance(l);
+                                return new_token(TOKEN_MODEQ, NULL);
+                        } else {
+                                return new_token(TOKEN_MOD, NULL);
+                        }
                 case '(':
+                        return new_token(TOKEN_LEFTPAREN, NULL);
                 case ')':
+                        return new_token(TOKEN_RIGHTPAREN, NULL);
                 case '{':
+                        return new_token(TOKEN_LEFTBRACE, NULL);
+                case '}':
+                        return new_token(TOKEN_RIGHTBRACE, NULL);
+                case '[':
+                        return new_token(TOKEN_LEFTBRACKET, NULL);
+                case ']':
+                        return new_token(TOKEN_RIGHTBRACKET, NULL);
+                case ';':
+                        return new_token(TOKEN_SEMICOLON, NULL);
+                case ',':
+                        return new_token(TOKEN_COMMA, NULL);
         }
 }
 
@@ -287,7 +418,7 @@ Token *get_tokens(FILE *file) {
                         current->prev = prev;
                 }
 
-                if (t->token == TOKEN_EOF) 
+                if (t->token == TOKEN_EOF) current->next = NULL;
 
                 prev = current;
                 current = t;

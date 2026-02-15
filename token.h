@@ -12,6 +12,11 @@ typedef enum {
         TOKEN_MULT,
         TOKEN_DIV,
         TOKEN_POW,
+        TOKEN_MULTEQUAL,
+        TOKEN_DIVEQUAL,
+        TOKEN_ADDEQUAL,
+        TOKEN_SUBEQUAL,
+        TOKEN_POWEQUAL,
         TOKEN_LEFTPAREN,
         TOKEN_RIGHTPAREN,
         TOKEN_LEFTBRACE,
@@ -40,11 +45,19 @@ typedef enum {
         TOKEN_BAND,
         TOKEN_BOR,
         TOKEN_BXOR,
+        TOKEN_BOREQ,
+        TOKEN_BANDEQ,
+        TOKEN_XOREQ,
         TOKEN_LEFTSHIFT,
         TOKEN_RIGHTSHIFT,
         TOKEN_EOF,
         TOKEN_BNOT,
+        TOKEN_BNOTEQ,
         TOKEN_NOT,
+        TOKEN_MOD,
+        TOKEN_MODEQ,
+        TOKEN_DEREFORMULT,
+        TOKEN_ARROWDEREF
 } TokenEnum;
 
 typedef struct Token {

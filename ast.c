@@ -13,7 +13,7 @@ void free_tokens(Token *t) {
 
         while (cursor != NULL) {
                 temp = cursor->prev;
-                free((void *) cursor->lexeme);
+                        free((void *) cursor->lexeme);
                 free(cursor);
                 cursor = temp;
         }
